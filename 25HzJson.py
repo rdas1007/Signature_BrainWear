@@ -58,35 +58,18 @@ input_folder = sys.argv[1]
 input_sub_folder = sys.argv[2]
 print(f'Input Folder: {input_folder}')
 print(f'Input Sub Folder: {input_sub_folder}')
-# This script expects a `CONFIG` dict to already be defined before this point
+# This script expects a 'CONFIG' dict to already be defined before this point
 # (e.g. imported from a project-specific config module, or otherwise supplied
 # by whatever caller runs this script). It must contain the following keys:
-#   base_path            str          Root directory containing the input data.
-#   target_path           str          Root directory to write the output JSON to.
-#   save                   str          Subfolder name used for saved results.
-#   process                 str          Processing mode label (e.g. 'RAW').
-#   sample_rate              int/float    Hz, sample rate of the raw signal.
-#   target_rate                int/float    Hz, sample rate after downsampling.
-#   downsample_factor            int          sample_rate / target_rate.
-#   bandpass_low, bandpass_high    float        Hz, bandpass filter cutoffs.
-#   bandpass_order                   int          Order of the bandpass filter.
-#   path_length                        int          Seconds per extracted path.
-#   path_samples                         int          Samples per path (path_length * target_rate).
-#   channels                               int          Number of signal channels (3 for x, y, z).
-#   min_burst_seconds                        int          Minimum walking burst duration (s) to keep.
-#   min_paths_per_day                          int          Minimum paths required to keep a day.
-#   sig_level, dyadic_order                      int          Signature transform parameters.
-#   baseline_days                                  int          Days used for the MMD baseline window.
-#   windows                                          list[int]    MMD window sizes, in days.
-#   batch_size, n_batches                              int          Mini-batch settings for MMD.
-#   max_mmd                                              float        Overflow threshold for MMD.
-#   days_before_clinic, days_after_clinic                  int          Window (days) around a clinic visit.
-#   pca_components                                           int          Number of PCA components.
-#   smooth_window                                              int          Rolling mean window for PCA smoothing.
-#   min_paths_pca                                                int          Minimum paths required for a PCA day.
-#   label_col                                                      str          Column name holding the activity label.
-#   activity_labels                                                  list[str]    Names of possible activity labels.
-#   raw_suffix, label_suffix                                           str          File suffixes for raw/label files.
+#   base_path            					str          Root directory containing the input data.
+#   target_path           					str          Root directory to write the output JSON to.
+#   sample_rate              				int/float    Hz, sample rate of the raw signal.
+#   target_rate                				int/float    Hz, sample rate after downsampling.
+#   bandpass_low, bandpass_high    			float        Hz, bandpass filter cutoffs.
+#   path_length                     		int          Seconds per extracted path.
+#   path_samples                         	int          Samples per path (path_length * target_rate).
+#   min_paths_per_day                       int          Minimum paths required to keep a day.
+#   label_col                               str          Column name holding the activity label.
 #
 # The keys below are derived at runtime from the command-line arguments and
 # are attached to the caller-supplied CONFIG here.
@@ -427,10 +410,10 @@ for date in all_dates:
 
     if paths is not None:
         all_daily_paths[date_str] = paths
-        print(f"{date_str}: ✅ {len(paths)} paths "
+        print(f"{date_str}: {len(paths)} paths "
               f"{paths.shape}")
     else:
-        print(f"{date_str}: ❌ skipped")
+        print(f"{date_str}: skipped")
 
 daily_paths_json = {}
 for k,v in all_daily_paths.items():
