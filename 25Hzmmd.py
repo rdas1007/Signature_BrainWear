@@ -1,81 +1,21 @@
 """
-Computes and visualises signature-based Maximum Mean Discrepancy (MMD)
-trends between a per-patient baseline period and rolling windows of daily
-movement paths, centred on clinic visit dates (stable vs. progression
-visits).
+This module expects a 'CONFIG' dict to already exist in the calling
+namespace (e.g. imported from a separate config module) before 'main()`'
+is invoked. Required CONFIG keys:
 
-This module expects a `CONFIG` dict to already exist in the calling
-namespace (e.g. imported from a separate config module) before `main()`
-is invoked, since site-specific paths and parameters are not hard-coded
-here. Required CONFIG keys:
-
-    base_path             (str)   Directory containing per-recording JSON
-                                   path files, organised by patient folder.
-    target_path            (str)  Directory where MMD results and plots
-                                   are written.
-    process                 (str) 'RAW' or 'ENMO' — selects whether raw
-                                   3-axis paths or ENMO+time paths are
-                                   loaded.
-    path_samples             (int) Number of samples per path; used to
-                                   build the per-recording JSON filename
-                                   and the output directory name.
-    baseline_days             (int) Number of days requested for the
-                                   baseline window before each clinic
-                                   visit.
-    windows                   (list[int]) MMD window sizes, in days, to
-                                   compute relative to each clinic visit.
-    dyadic_order               (int) Dyadic order parameter passed to the
-                                   signature MMD computation.
-    max_mmd                     (float) MMD values above this threshold
-                                   are treated as invalid/overflow and
-                                   replaced with NaN.
-    max_paths                   (int) Maximum number of paths to
-                                   subsample per baseline/window batch
-                                   before computing MMD.
-    patient_metadata_path        (str) Path to the spreadsheet containing
-                                   each patient's stable/progression
-                                   clinic visit dates.
+    base_path                 (str)                   Directory containing per-recording JSON path files, organised by patient folder.
+    target_path               (str)                   Directory where MMD results and plots are written.
+    process                   (str)                   'RAW' or 'ENMO' — selects whether raw 3-axis paths or ENMO+time paths are loaded.
+    path_samples              (int)                   Number of samples per path; used to build the per-recording JSON filename and the output directory name.
+    baseline_days             (int)                   Number of days requested for the baseline window before each clinic visit.
+    windows                   (list[int])             MMD window sizes, in days, to compute relative to each clinic visit.
+    dyadic_order              (int)                   Dyadic order parameter passed to the signature MMD computation.
+    max_mmd                   (float)                 MMD values above this threshold are treated as invalid/overflow and replaced with NaN.
+    max_paths                 (int)                   Maximum number of paths to subsample per baseline/window batch before computing MMD.
+    patient_metadata_path     (str)                   Path to the spreadsheet containing each patient's stable/progression clinic visit dates.
 
 The patient/session folder to process is read from sys.argv[1].
 
-Functions:
-- transform_to_enmo_time: Converts raw (n, T, 3) accelerometer paths into
-  (n, T, 2) ENMO + normalised-time paths.
-- load_and_merge_jsons: Loads and merges raw per-recording path JSON files
-  into a single dict keyed by date, concatenating paths when a date
-  appears in more than one file.
-- load_and_merge_jsons_enmo: Same as above, but converts each loaded
-  array to ENMO + time representation immediately after loading.
-- build_final_dict: For each clinic visit date, builds a baseline window
-  and an observation window of daily paths, expanding the baseline
-  window forward when too few data days are initially available.
-- subsample_day: Randomly subsamples a fixed number of paths from a day
-  (returns all paths if fewer than requested are available).
-- compute_mmd_dynamic_windows: Computes signature MMD between the scaled
-  baseline paths and non-overlapping windows of paths leading up to each
-  clinic date.
-- save_mmd_results: Serialises MMD results (with datetime keys) to JSON.
-- load_mmd_results: Loads an MMD results JSON file back into a dict with
-  datetime keys.
-- find_clinic_dates: Reads a patient's stable/progression clinic visit
-  dates from a metadata spreadsheet, keyed by patient folder name.
-- get_visit_color: Returns a display color for a clinic visit based on
-  its stable/progression type.
-- get_visit_label: Returns a display label for a clinic visit based on
-  its stable/progression type.
-- smooth_series: Applies a centred rolling mean to a date-indexed series.
-- parse_result_dates: Parses an MMD results dict into sorted, non-NaN
-  (dates, values) lists.
-- plot_mmd_absolute: Plots MMD over absolute calendar time, one subplot
-  per window size, with clinic visit dates marked.
-- plot_mmd_relative: Plots MMD relative to each clinic date (days
-  before/after), one subplot per window size.
-- plot_mmd_per_visit: Plots one figure per clinic visit, showing the MMD
-  trend and baseline period around that visit.
-- plot_mmd_distribution: Plots a boxplot comparing MMD distributions
-  between stable and progression visits.
-- main: Runs the full pipeline — loads paths, builds baseline/window
-  data, computes MMD, saves results, and generates all plots.
 """
 
 import json
